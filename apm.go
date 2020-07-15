@@ -6,14 +6,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 func apmServer(cfg Config, shutdownCh <-chan struct{}, logger *log.Logger) {
 	srv := &http.Server{
-		Addr:         cfg.APMAddr,
-		ReadTimeout:  cfg.APMReadTimeout,
-		WriteTimeout: cfg.APMWriteTimeout,
-
+		Addr: cfg.APMAddr,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			n, _ := io.Copy(ioutil.Discard, r.Body)
 			if cfg.Verbose {
@@ -29,7 +27,7 @@ func apmServer(cfg Config, shutdownCh <-chan struct{}, logger *log.Logger) {
 		<-shutdownCh
 		logger.Printf("shutting down ...")
 
-		ctx, cancel := context.WithTimeout(context.Background(), cfg.APMShutdownTimeout)
+		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 		defer cancel()
 
 		if err := srv.Shutdown(ctx); err != nil {

@@ -6,26 +6,36 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
-	"time"
-
-	"github.com/kelseyhightower/envconfig"
 )
 
+// Config contains application configuration
 type Config struct {
-	APMAddr            string        `default:":8216" split_words:"true"`
-	APMShutdownTimeout time.Duration `default:"500ms" split_words:"true"`
-	APMReadTimeout     time.Duration `default:"500ms" split_words:"true"`
-	APMWriteTimeout    time.Duration `default:"250ms" split_words:"true"`
-	StatsdAddr         string        `default:":8215" split_words:"true"`
-	StatsdReadTimeout  time.Duration `default:"250ms" split_words:"true"`
-	Verbose            bool
+	APMAddr    string
+	StatsdAddr string
+	Verbose    bool
+}
+
+// loadConfig loads application configuration from the environment.
+func loadConfig(getenv func(string) string) Config {
+	cfg := Config{
+		APMAddr:    ":8126",
+		StatsdAddr: ":8125",
+		Verbose:    false,
+	}
+	if apmAddr := getenv("APM_ADDR"); apmAddr != "" {
+		cfg.APMAddr = apmAddr
+	}
+	if statsdAddr := getenv("STATSD_ADDR"); statsdAddr != "" {
+		cfg.StatsdAddr = statsdAddr
+	}
+	if verbose := getenv("VERBOSE"); verbose != "" {
+		cfg.Verbose = verbose == "true" || verbose == "t" || verbose == "1"
+	}
+	return cfg
 }
 
 func main() {
-	var cfg Config
-	if err := envconfig.Process("", cfg); err != nil {
-		log.Fatalf("invalid configuration: %s", err)
-	}
+	cfg := loadConfig(os.Getenv)
 
 	var (
 		logPrefix = "[datadog-agent-stub]"

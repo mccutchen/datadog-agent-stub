@@ -15,7 +15,7 @@ func apmServer(cfg Config, shutdownCh <-chan struct{}, logger *log.Logger) {
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			n, _ := io.Copy(ioutil.Discard, r.Body)
 			if cfg.Verbose {
-				logger.Printf("%s %s %d", r.Method, r.RequestURI, n)
+				logger.Printf("method=%q uri=%q bodysize=%d", r.Method, r.RequestURI, n)
 			}
 		}),
 	}

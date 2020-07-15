@@ -36,7 +36,7 @@ func statsdServer(cfg Config, shutdownCh <-chan struct{}, logger *log.Logger) {
 			return
 		}
 		if cfg.Verbose {
-			logger.Printf("recv: %s", string(buf[:n]))
+			logger.Printf("packet=%q", string(buf[:n]))
 		}
 	}
 }

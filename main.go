@@ -40,7 +40,7 @@ func main() {
 	var (
 		logPrefix = "[datadog-agent-stub]"
 		logFlags  = log.LstdFlags
-		apmLog    = log.New(os.Stdout, logPrefix+"[apm] ", logFlags)
+		apmLog    = log.New(os.Stdout, logPrefix+"[apm]    ", logFlags)
 		statsdLog = log.New(os.Stdout, logPrefix+"[statsd] ", logFlags)
 	)
 

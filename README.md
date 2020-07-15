@@ -1,13 +1,28 @@
 # datadog-agent-stub
 
 A lightweight, no-op substitute for the datadog-agent in development
-environments.
+environments, useful when you want your applications to connect to real statsd
+(UDP) and APM trace (HTTP) endpoints but don't want to set up a fully
+functional datadog-agent process.
+
+This stub agent logs nothing by default, but when run with `VERBOSE=true` it
+logs the statsd metrics and HTTP requests it receives.
 
 ## Usage
 
+### Configuration
+
+Configure datadog-agent-stub using environment variables:
+
+| Env var | Default | Description |
+| ------- | ------- | ------------|
+| `APM_ADDR` | :8126 | Address on which to listen for APM traces, in IP:PORT form |
+| `STATSD_ADDR` | :8125 | Address on which to listen for statsd metrics, in IP:PORT form |
+| `VERBOSE` | false | Whether to log incoming metrics and traces |
+
 ### Example
 
-Here's an example Docker Compose file that demonstrates how to use the
+An example Docker Compose file that demonstrates how to use the
 datadog-agent-stub container as a replacement for a production datadog-agent
 deployment during local development:
 

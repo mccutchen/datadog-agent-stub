@@ -4,10 +4,7 @@ import (
 	"log"
 	"net"
 	"strings"
-	"time"
 )
-
-const statsdReadTimeout = 250 * time.Millisecond
 
 func statsdServer(cfg Config, shutdownCh <-chan struct{}, logger *log.Logger) {
 	packetConn, err := net.ListenPacket("udp", cfg.StatsdAddr)
@@ -22,7 +19,7 @@ func statsdServer(cfg Config, shutdownCh <-chan struct{}, logger *log.Logger) {
 	go func() {
 		<-shutdownCh
 		logger.Printf("shutting down ...")
-		packetConn.Close()
+		_ = packetConn.Close()
 	}()
 
 	buf := make([]byte, 1024)

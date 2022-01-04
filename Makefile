@@ -10,8 +10,9 @@ DIST_PATH ?= dist
 
 # Tool dependencies
 TOOL_BIN_DIR     ?= $(shell go env GOPATH)/bin
-TOOL_GOLINT      := $(TOOL_BIN_DIR)/golint
 TOOL_ERRCHECK    := $(TOOL_BIN_DIR)/errcheck
+TOOL_GOLINT      := $(TOOL_BIN_DIR)/golint
+TOOL_GORELEASER  := $(TOOL_BIN_DIR)/goreleaser
 TOOL_STATICCHECK := $(TOOL_BIN_DIR)/staticcheck
 
 
@@ -24,6 +25,9 @@ build:
 
 clean:
 	rm -rf $(DIST_PATH) $(COVERAGE_PATH)
+
+release: build lint clean
+	goreleaser release --rm-dist
 
 
 # =============================================================================
@@ -49,13 +53,16 @@ imagepush: image
 # =============================================================================
 # dependencies
 # =============================================================================
-deps: $(TOOL_GOLINT) $(TOOL_ERRCHECK) $(TOOL_STATICCHECK)
+deps: $(TOOL_GOLINT) $(TOOL_GORELEASER) $(TOOL_ERRCHECK) $(TOOL_STATICCHECK)
+
+$(TOOL_ERRCHECK):
+	go install github.com/kisielk/errcheck@latest
 
 $(TOOL_GOLINT):
 	go install golang.org/x/lint/golint@latest
 
-$(TOOL_ERRCHECK):
-	go install github.com/kisielk/errcheck@latest
+$(TOOL_GORELEASER):
+	go install github.com/goreleaser/goreleaser@latest
 
 $(TOOL_STATICCHECK):
 	go install honnef.co/go/tools/cmd/staticcheck@latest

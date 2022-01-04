@@ -48,16 +48,14 @@ imagepush: image
 
 # =============================================================================
 # dependencies
-#
-# we cd out of the working dir to avoid these tools polluting go.mod/go.sum
 # =============================================================================
 deps: $(TOOL_GOLINT) $(TOOL_ERRCHECK) $(TOOL_STATICCHECK)
 
 $(TOOL_GOLINT):
-	cd /tmp && go get -u golang.org/x/lint/golint
+	go install golang.org/x/lint/golint@latest
 
 $(TOOL_ERRCHECK):
-	cd /tmp && go get -u github.com/kisielk/errcheck
+	go install github.com/kisielk/errcheck@latest
 
 $(TOOL_STATICCHECK):
-	cd /tmp && go get -u honnef.co/go/tools/cmd/staticcheck
+	go install honnef.co/go/tools/cmd/staticcheck@latest

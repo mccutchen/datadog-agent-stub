@@ -13,9 +13,24 @@ func apmServer(cfg Config, shutdownCh <-chan struct{}, logger *log.Logger) {
 	srv := &http.Server{
 		Addr: cfg.APMAddr,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			statusCode := http.StatusOK
+
+			// Respond with a 404 to agent health checks, to indicate that
+			// remote configuration is not enabled or supported.
+			//
+			// See, e.g., the relevant code from the dd-trace-py client impl:
+			// https://github.com/DataDog/dd-trace-py/blob/v1.9.4/ddtrace/internal/agent.py#L151-L169
+			if r.URL.Path == "/info" {
+				statusCode = http.StatusNotFound
+			}
+
+			// Otherwise, assume we received trace data via PUT /v0.5/traces or
+			// POST /v0.4/traces
 			n, _ := io.Copy(ioutil.Discard, r.Body)
+
+			w.WriteHeader(statusCode)
 			if cfg.Verbose {
-				logger.Printf("method=%q uri=%q bodysize=%d", r.Method, r.RequestURI, n)
+				logger.Printf("status=%d method=%q uri=%q bodysize=%d", statusCode, r.Method, r.RequestURI, n)
 			}
 		}),
 	}
